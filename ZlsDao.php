@@ -496,7 +496,7 @@ abstract class Zls_Dao
         return ['items' => $result, 'page' => Z::page($pageRes['total'], $page, $pagesize, $url, $pageBarACount)];
     }
 
-    final private function _pageCommon($page, $pagesize, $where, $orderBy, $fields)
+    private function _pageCommon($page, $pagesize, $where, $orderBy, $fields)
     {
         $total = $this->selectCount($where);
         if (is_array($where)) {
