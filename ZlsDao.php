@@ -10,14 +10,22 @@
  */
 abstract class Zls_Dao
 {
-    private $Db;
-    private $Rs;
-    private $CacheTime = null;
-    private $CacheKey;
+    private $db;
+    private $rs;
+    private $cacheTime = null;
+    private $cacheKey;
 
     public function __construct()
     {
         $this->Db = Z::db();
+    }
+
+    /**
+     * @return self
+     */
+    public static function dao()
+    {
+        return Z::factory(get_called_class(),true);
     }
 
     public function __call($name, $args)
@@ -92,13 +100,13 @@ abstract class Zls_Dao
     /**
      * 设置Dao中使用的数据库操作对象
      *
-     * @param Zls_Database_ActiveRecord $Db
+     * @param Zls_Database_ActiveRecord $db
      *
      * @return $this
      */
-    public function setDb(Zls_Database_ActiveRecord $Db)
+    public function setDb(Zls_Database_ActiveRecord $db)
     {
-        $this->Db = $Db;
+        $this->Db = $db;
 
         return $this;
     }
@@ -272,7 +280,7 @@ abstract class Zls_Dao
         }
         if (!is_null($limit)) {
             if (is_array($limit)) {
-                list($offset, $count) = $limit;
+                [$offset, $count] = $limit;
             } else {
                 $offset = 0;
                 $count  = $limit;
