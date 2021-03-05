@@ -17,7 +17,7 @@ abstract class Zls_Dao
 
     public function __construct()
     {
-        $this->Db = Z::db();
+        $this->db = Z::db();
     }
 
     /**
@@ -94,7 +94,7 @@ abstract class Zls_Dao
      */
     public function &getDb()
     {
-        return $this->Db;
+        return $this->db;
     }
 
     /**
@@ -106,7 +106,7 @@ abstract class Zls_Dao
      */
     public function setDb(Zls_Database_ActiveRecord $db)
     {
-        $this->Db = $db;
+        $this->db = $db;
 
         return $this;
     }
@@ -122,9 +122,9 @@ abstract class Zls_Dao
         $beanName = str_replace('Dao_', '', $beanName);
         $beanName = str_replace('Dao\\', '', $beanName);
         try {
-            if (z::strEndsWith($beanName, 'Dao')) {
+            if (Z::strEndsWith($beanName, 'Dao')) {
                 $newBeanName = substr($beanName, 0, -3) . 'Bean';
-                z::bean($newBeanName);
+                Z::bean($newBeanName);
 
                 return $newBeanName;
             }
@@ -280,25 +280,25 @@ abstract class Zls_Dao
         }
         if (!is_null($limit)) {
             if (is_array($limit)) {
-                [$offset, $count] = $limit;
+                list($offset, $count) = $limit;
             } else {
                 $offset = 0;
                 $count  = $limit;
             }
             $db->limit($offset, $count);
         }
-        if (!is_null($this->CacheTime)) {
-            $db->cache($this->CacheTime, $this->CacheKey);
+        if (!is_null($this->cacheTime)) {
+            $db->cache($this->cacheTime, $this->cacheKey);
         }
         $db->from($this->getTable());
         is_array($where) ? $db->where($where) : (is_callable($where) ? $where($db) : $db->where([$this->getPrimaryKey() => $where]));
         $result = static::findBefore($db, 'findAll');
         if (is_null($result)) {
-            $this->Rs = $db->execute();
-            $result   = $this->Rs->rows();
+            $this->rs = $db->execute();
+            $result   = $this->rs->rows();
         }
 
-        return z::tap($result, function () {
+        return Z::tap($result, function () {
             $this->__destruct();
         });
     }
@@ -316,7 +316,7 @@ abstract class Zls_Dao
         if (!$field) {
             $field = static::getHideColumns();
         }
-        // z::throwIf(!$field, 500,'[ '.get_class($this).'->getHideColumns() ] not found, did you forget to set ?');
+        // Z::throwIf(!$field, 500,'[ '.get_class($this).'->getHideColumns() ] not found, did you forget to set ?');
         /** @noinspection PhpParamsInspection */
         $fields = array_diff(static::getColumns(), is_array($field) ? $field : ($field ? explode(',', $field) : []));
 
@@ -355,8 +355,8 @@ abstract class Zls_Dao
      */
     public function cache($cacheTime = 0, $cacheKey = '')
     {
-        $this->CacheTime = (int)$cacheTime;
-        $this->CacheKey  = $cacheKey;
+        $this->cacheTime = (int)$cacheTime;
+        $this->cacheKey  = $cacheKey;
 
         return $this;
     }
@@ -410,8 +410,8 @@ abstract class Zls_Dao
         if (!$isRows) {
             $db->limit(0, 1);
         }
-        if (!is_null($this->CacheTime)) {
-            $db->cache($this->CacheTime, $this->CacheKey);
+        if (!is_null($this->cacheTime)) {
+            $db->cache($this->cacheTime, $this->cacheKey);
         }
         $db->from($this->getTable());
         if (!empty($values)) {
@@ -428,18 +428,18 @@ abstract class Zls_Dao
         }
         $result = static::findBefore($db, 'find');
         if (is_null($result)) {
-            $this->Rs = $db->execute();
-            $result   = $isRows ? $this->Rs->rows() : $this->Rs->row();
+            $this->rs = $db->execute();
+            $result   = $isRows ? $this->rs->rows() : $this->rs->row();
         }
 
-        return z::tap($result, function () {
+        return Z::tap($result, function () {
             $this->__destruct();
         });
     }
 
     public function reaultset()
     {
-        return $this->Rs;
+        return $this->rs;
     }
 
     /**
