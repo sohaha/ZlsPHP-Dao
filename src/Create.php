@@ -17,10 +17,10 @@ class Create
 {
     public function bean($columns)
     {
-        $fields        = [];
+        $fields = [];
         $fieldTemplate = "    //{comment}\n    protected \${column0};";
         foreach ($columns as $value) {
-            $column  = str_replace(' ', '', ucwords(str_replace('_', ' ', $value['name'])));
+            $column = str_replace(' ', '', ucwords(str_replace('_', ' ', $value['name'])));
             $column0 = $value['name'];
             /*$column1 = lcfirst($column);*/
             $fields[] = str_replace(
@@ -42,7 +42,7 @@ class Create
     public function dao($columns, $table, $isAfresh = false)
     {
         $primaryKey = '';
-        $_columns   = [];
+        $_columns = [];
         foreach ($columns as $value) {
             if ($value['primary']) {
                 $primaryKey = $value['name'];
@@ -50,12 +50,8 @@ class Create
             $_columns[] = '\'' . $value['name'] . "',//" . $value['comment'] . PHP_EOL . '            ';
         }
         $columnsString = '[' . PHP_EOL . '            ' . implode('', $_columns) . ']';
-        $code          = "public function getColumns() {
+        $code = "public function getColumns() {
         return {columns};
-    }
-
-    public function getHideColumns() {
-        return [];
     }
 
     public function getPrimaryKey() {
@@ -64,9 +60,14 @@ class Create
 
     public function getTable() {
         return '{table}';
-    }";
+    }
+";
         if (!$isAfresh) {
             $code .= "
+    public function getHideColumns() {
+        return [];
+    }
+
     public static function findBefore(\Zls_Database_ActiveRecord \$db, \$method) {
 
     }
@@ -90,8 +91,8 @@ class Create
         return parent::getBean();
     }";
         }
-        $code    = str_replace(['{columns}', '{primaryKey}', '{table}'], [$columnsString, $primaryKey, $table], $code);
-        $methods = ['getColumns', 'getHideColumns', 'getPrimaryKey', 'getTable', 'getBean'];
+        $code = str_replace(['{columns}', '{primaryKey}', '{table}'], [$columnsString, $primaryKey, $table], $code);
+        $methods = ['getColumns', 'getPrimaryKey', 'getTable'];
 
         return [$code, $primaryKey ? '' : 'Did not find the primary key, please fill in manually.', $methods];
     }
