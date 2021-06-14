@@ -50,7 +50,9 @@ class Create
             $_columns[] = '\'' . $value['name'] . "',//" . $value['comment'] . PHP_EOL . '            ';
         }
         $columnsString = '[' . PHP_EOL . '            ' . implode('', $_columns) . ']';
-        $code = "public function getColumns() {
+        $code = "use \Zls\Dao\DaoUtil;
+
+    public function getColumns() {
         return {columns};
     }
 
@@ -68,21 +70,21 @@ class Create
         return [];
     }
 
-    public static function findBefore(\Zls_Database_ActiveRecord \$db, \$method) {
+    // public static function findBefore(\Zls_Database_ActiveRecord \$db, \$method) {
 
-    }
+    // }
 
-    public static function deleteBefore(\Zls_Database_ActiveRecord \$db, \$wheres = []) {
+    // public static function deleteBefore(\Zls_Database_ActiveRecord \$db, \$wheres = []) {
 
-    }
+    // }
 
-    public static function insertBefore(\Zls_Database_ActiveRecord \$db, \$method, &\$data) {
+    // public static function insertBefore(\Zls_Database_ActiveRecord \$db, \$method, &\$data) {
 
-    }
+    // }
 
-    public static function updateBefore(\Zls_Database_ActiveRecord \$db, \$method, &\$data) {
+    // public static function updateBefore(\Zls_Database_ActiveRecord \$db, \$method, &\$data) {
 
-    }
+    // }
 ";
         }
         if (false !== strpos(z::getOpt(1), 'bean')) {
