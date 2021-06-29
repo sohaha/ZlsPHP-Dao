@@ -66,6 +66,10 @@ class Create
 ";
         if (!$isAfresh) {
             $code .= "
+    public function getRules(\$columns = []) {
+        return [];
+    }
+
     public function getHideColumns() {
         return [];
     }
