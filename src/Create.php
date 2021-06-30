@@ -67,7 +67,16 @@ class Create
         if (!$isAfresh) {
             $code .= "
     public function getRules(\$columns = []) {
-        return [];
+        \$verifyRules = [];
+
+        // your rules ...
+        // \$verifyRules['fieldName']   = [
+        //     'functions[strip_tags,trim]' => '',
+        //     'required'                   => 'can not be empty',
+        //     'max_len[200]'               => 'up to 200 characters',
+        // ];
+
+        return \$verifyRules;
     }
 
     public function getHideColumns() {

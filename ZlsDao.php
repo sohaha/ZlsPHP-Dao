@@ -134,7 +134,7 @@ abstract class Zls_Dao
 
     public function bean($row, $beanName = '')
     {
-        return Z::bean($beanName ? $beanName : $this->getBean(), $row, false)->toArray();
+        return Z::bean($beanName ?: $this->getBean(), $row, false)->toArray(array_keys($row));
     }
 
     protected function getBean()
@@ -142,34 +142,22 @@ abstract class Zls_Dao
         $beanName = strstr(get_class($this), 'Dao', false);
         $beanName = str_replace('Dao_', '', $beanName);
         $beanName = str_replace('Dao\\', '', $beanName);
-        try {
-            if (Z::strEndsWith($beanName, 'Dao')) {
-                $newBeanName = substr($beanName, 0, -3) . 'Bean';
-                Z::bean($newBeanName);
-
-                return $newBeanName;
-            }
-        } catch (\Zls_Exception_500 $e) {
-            Z::throwIf(!Z::strEndsWith($e->getMessage(), 'not found'), 500, $e->getMessage());
+        if (Z::strEndsWith($beanName, 'Dao')) {
+            $beanName = substr($beanName, 0, -3) . 'Bean';
         }
-
         return $beanName;
     }
 
     public function beans($rows, $beanName = '')
     {
         $beanName = $beanName ?: $this->getBean();
-        $objects = [];
-        foreach ($rows as $row) {
-            $object = Z::bean($beanName, $row, false);
-            foreach ($row as $key => $value) {
-                $method = 'set' . Z::strSnake2Camel($key);
-                $object->{$method}($value);
-            }
-            $objects[] = $object->toArray();
+        $bean = Z::bean($beanName, [], true);
+        foreach ($rows as &$row) {
+            $bean->init($row);
+            $keys = array_keys($row);
+            $row = $bean->toArray($keys);
         }
-
-        return $objects;
+        return $rows;
     }
 
     /**
@@ -482,11 +470,11 @@ abstract class Zls_Dao
      * 分页方法.
      *
      * @param int $page 第几页
-     * @param int $pagesize 每页多少条
+     * @param int|array $pagesize 每页多少条 传递数组可以限制最大显示量 [pagesize,maxPagesize]
      * @param string $url 基础url，里面的{page}会被替换为实际的页码
      * @param string $fields select的字段，全部用*，多个字段用逗号分隔
      * @param array|Closure $where where条件，关联数组
-     * @param array $orderBy 排序字段，比如：array('time'=>'desc')或者array('time'=>'desc','id'=>'asc')
+     * @param array $orderBy 排序字段，比如：['time'=>'desc'] 或者 ['time'=>'desc','id'=>'asc']
      * @param int $pageBarACount 分页条的数量
      *
      * @return array
@@ -494,6 +482,13 @@ abstract class Zls_Dao
     public function getPage($page = 1, $pagesize = 10, $url = '{page}', $fields = null, $where = null, array $orderBy = [], $pageBarACount = 6)
     {
         $fields = $fields ?: $this->getReversalColumns(null, true);
+        $maxPagesize = $pagesize;
+        if (is_array($pagesize)) {
+            $maxPagesize = Z::arrayGet($pagesize, 1, $pagesize[0]);
+            if ($pagesize > $maxPagesize) {
+                $pagesize = $maxPagesize;
+            }
+        }
         $pagesize = ((int)$pagesize > 0) ? $pagesize : 1;
         $pageRes = $this->_pageCommon($page, $pagesize, $where, $orderBy, $fields);
         $result = static::findBefore($this->getDb(), 'getPage');
