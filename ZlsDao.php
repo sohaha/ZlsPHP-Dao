@@ -485,6 +485,7 @@ abstract class Zls_Dao
         $maxPagesize = $pagesize;
         if (is_array($pagesize)) {
             $maxPagesize = Z::arrayGet($pagesize, 1, $pagesize[0]);
+            $pagesize = Z::arrayGet($pagesize, 0, $pagesize[0]);
             if ($pagesize > $maxPagesize) {
                 $pagesize = $maxPagesize;
             }
