@@ -66,17 +66,23 @@ class Create
 ";
         if (!$isAfresh) {
             $code .= "
-    public function getRules(\$columns = []) {
-        \$verifyRules = [];
+    public function verifyRules(\$columns = []) {
+        \$rules = [];
 
         // your rules ...
-        // \$verifyRules['fieldName']   = [
+        // \$rules['fieldName']   = [
         //     'functions[strip_tags,trim]' => '',
         //     'required'                   => 'can not be empty',
         //     'max_len[200]'               => 'up to 200 characters',
         // ];
 
-        return \$verifyRules;
+        \$verifyrules = [];
+        foreach (\$rules as \$key => \$rule) {
+            if (in_array(\$key, \$columns)) {
+                \$verifyrules[\$key] = \$rule;
+            }
+        }
+        return \$verifyrules;
     }
 
     public function getHideColumns() {
