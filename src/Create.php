@@ -67,6 +67,9 @@ class Create
         if (!$isAfresh) {
             $code .= "
     public function verifyRules(\$columns = []) {
+        if (!\$columns) {
+                \$columns = \$this->getReversalColumns();
+        }
         \$rules = [];
 
         // your rules ...
