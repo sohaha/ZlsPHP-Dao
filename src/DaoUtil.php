@@ -18,13 +18,16 @@ trait DaoUtil
         if (!static::$openDataTime) {
             return;
         }
-        $dao = Z::factory(__CLASS__, true);
+        $dao = self::instance();
         $columns = $dao->getColumns();
-        $time = Z::arrayGet(static::$dataTimeFormat, 'value') ?: date('Y-m-d H:i:s');
         $updateKey = Z::arrayGet(static::$dataTimeFormat, 'updateKey');
         $hasUpdateKey = in_array($updateKey, $columns, true);
         $createKey = Z::arrayGet(static::$dataTimeFormat, 'createKey');
         $hasCreateKey = in_array($createKey, $columns, true);
+        if (!$hasCreateKey && !$hasUpdateKey) {
+            return;
+        }
+        $time = Z::arrayGet(static::$dataTimeFormat, 'value') ?: date('Y-m-d H:i:s');
         if (in_array($method, ['insert', 'update'], true)) {
             $hasUpdateKey && $data[$updateKey] = $time;
             if ($method === 'insert' && $hasCreateKey) {
@@ -67,7 +70,7 @@ trait DaoUtil
 
     protected static function softFind(\Zls_Database_ActiveRecord $db, $method)
     {
-        $dao = Z::factory(__CLASS__, true);
+        $dao = self::instance();
         $columns = $dao->getColumns();
         if (in_array(Z::arrayGet(self::$softDeleteFormat, 'key'), $columns)) {
             $db->where([static::$softDeleteFormat['key'] . ' !=' => static::$softDeleteFormat['value']]);
@@ -76,7 +79,7 @@ trait DaoUtil
 
     protected static function softDelete(\Zls_Database_ActiveRecord $db, $wheres)
     {
-        $dao = Z::factory(__CLASS__, true);
+        $dao = self::instance();
         $columns = $dao->getColumns();
         if (in_array(Z::arrayGet(self::$softDeleteFormat, 'key'), $columns)) {
             /** @noinspection PhpUndefinedMethodInspection */

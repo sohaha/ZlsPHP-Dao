@@ -18,5 +18,7 @@
       "Zls\\Dao\\": "src/"
     }
   },
-  "require": {}
+  "require": {
+    "zls/framework": "*"
+  }
 }

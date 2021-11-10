@@ -25,7 +25,15 @@ abstract class Zls_Dao
      */
     public static function dao()
     {
-        return Z::factory(get_called_class(), true);
+        return self::instance();
+    }
+
+    /**
+     * @return self
+     */
+    public static function instance($shared = true, $args = [], $hmvcModuleName = null)
+    {
+        return Z::factory(get_called_class(), $shared, $hmvcModuleName, $args);
     }
 
     public function __call($name, $args)
@@ -174,9 +182,9 @@ abstract class Zls_Dao
         if (is_null($Before)) {
             $num = $this->getDb()->execute();
 
-            return $num ? $this->getDb()->lastId() : 0;
+            return $num ? (int)$this->getDb()->lastId() : 0;
         } else {
-            return $Before;
+            return (int)$Before;
         }
     }
 

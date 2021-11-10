@@ -4,15 +4,6 @@ namespace Zls\Dao;
 
 use Z;
 
-/**
- * Zls.
- * @author        影浅
- * @email         seekwe@gmail.com
- * @copyright     Copyright (c) 2015 - 2017, 影浅, Inc.
- * @see           ---
- * @since         v0.0.1
- * @updatetime    2018-08-01 13:00
- */
 class Create
 {
     public function bean($columns)
@@ -50,9 +41,8 @@ class Create
             $_columns[] = '\'' . $value['name'] . "',//" . $value['comment'] . PHP_EOL . '            ';
         }
         $columnsString = '[' . PHP_EOL . '            ' . implode('', $_columns) . ']';
-        $code = "use \Zls\Dao\DaoUtil;
-
-    public function getColumns() {
+        $code = $isAfresh?'':'use \Zls\Dao\DaoUtil;';
+        $code = "public function getColumns() {
         return {columns};
     }
 
@@ -79,13 +69,7 @@ class Create
         //     'max_len[200]'               => 'up to 200 characters',
         // ];
 
-        \$verifyrules = [];
-        foreach (\$rules as \$key => \$rule) {
-            if (in_array(\$key, \$columns)) {
-                \$verifyrules[\$key] = \$rule;
-            }
-        }
-        return \$verifyrules;
+        return \$verifyRules;
     }
 
     public function getHideColumns() {
@@ -109,7 +93,7 @@ class Create
     // }
 ";
         }
-        if (false !== strpos(z::getOpt(1), 'bean')) {
+        if (false !== strpos(Z::getOpt(1), 'bean')) {
             $code .= "
     public function getBean() {
         return parent::getBean();
