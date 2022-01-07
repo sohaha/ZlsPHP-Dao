@@ -41,7 +41,7 @@ class Create
             $_columns[] = '\'' . $value['name'] . "',//" . $value['comment'] . PHP_EOL . '            ';
         }
         $columnsString = '[' . PHP_EOL . '            ' . implode('', $_columns) . ']';
-        $code = $isAfresh?'':'use \Zls\Dao\DaoUtil;';
+        $code = $isAfresh ? '' : 'use \Zls\Dao\DaoUtil;';
         $code = "public function getColumns() {
         return {columns};
     }
@@ -56,10 +56,7 @@ class Create
 ";
         if (!$isAfresh) {
             $code .= "
-    public function verifyRules(\$columns = []) {
-        if (!\$columns) {
-                \$columns = \$this->getReversalColumns();
-        }
+    public function getRules() {
         \$rules = [];
 
         // your rules ...
@@ -69,7 +66,7 @@ class Create
         //     'max_len[200]'               => 'up to 200 characters',
         // ];
 
-        return \$verifyRules;
+        return \$rules;
     }
 
     public function getHideColumns() {

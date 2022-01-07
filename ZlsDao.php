@@ -21,7 +21,7 @@ abstract class Zls_Dao
     }
 
     /**
-     * @return self
+     * @return static
      */
     public static function dao()
     {
@@ -29,7 +29,7 @@ abstract class Zls_Dao
     }
 
     /**
-     * @return self
+     * @return static
      */
     public static function instance($shared = true, $args = [], $hmvcModuleName = null)
     {
@@ -124,7 +124,7 @@ abstract class Zls_Dao
     public function readData($data, $field = null, $replenish = false)
     {
         if (!$field) {
-            $field = static::getColumns();
+            $field = $this->getColumns();
         }
 
         return Z::readData($field, $data, $replenish);
@@ -137,7 +137,7 @@ abstract class Zls_Dao
          */
         $CommandCreateMysql = Z::extension('Command\Create\Mysql');
 
-        return array_keys($CommandCreateMysql->getTableFieldsInfo(static::getTable(), static::getDb()));
+        return array_keys($CommandCreateMysql->getTableFieldsInfo($this->getTable(), $this->getDb()));
     }
 
     public function bean($row, $beanName = '')
@@ -322,11 +322,11 @@ abstract class Zls_Dao
     public function getReversalColumns($field = null, $exPre = false)
     {
         if (!$field) {
-            $field = static::getHideColumns();
+            $field = $this->getHideColumns();
         }
         // Z::throwIf(!$field, 500,'[ '.get_class($this).'->getHideColumns() ] not found, did you forget to set ?');
         /** @noinspection PhpParamsInspection */
-        $fields = array_diff(static::getColumns(), is_array($field) ? $field : ($field ? explode(',', $field) : []));
+        $fields = array_diff($this->getColumns(), is_array($field) ? $field : ($field ? explode(',', $field) : []));
 
         return $exPre ? join(is_string($exPre) ? $exPre : ',', $fields) : $fields;
     }
@@ -385,14 +385,14 @@ abstract class Zls_Dao
     /**
      * 获取一条或者多条数据.
      *
-     * @param string|array|callable $values 可以是一个主键的值或者主键的值数组，还可以是where条件
-     * @param bool $isRows 返回多行记录还是单行记录，true：多行，false：单行
-     * @param array $orderBy 当返回多行记录时，可以指定排序，比如：array('time'=>'desc')或者array('time'=>'desc','id'=>'asc')
-     * @param string|null $fields 要搜索的字段，比如：id,name。留空默认*
+     * @param string|array|callable $where   可以是一个主键的值或者主键的值数组，还可以是where条件
+     * @param bool                  $isRows  返回多行记录还是单行记录，true：多行，false：单行
+     * @param array                 $orderBy 当返回多行记录时，可以指定排序，比如：array('time'=>'desc')或者array('time'=>'desc','id'=>'asc')
+     * @param string|null           $fields  要搜索的字段，比如：id,name。留空默认*
      *
      * @return array
      */
-    public function find($values, $isRows = false, array $orderBy = [], $fields = null)
+    public function find($where, $isRows = false, array $orderBy = [], $fields = null)
     {
         $db = $this->getDb();
         $db->select($fields ?: $this->getReversalColumns(null, true));
@@ -410,16 +410,16 @@ abstract class Zls_Dao
             $db->cache($this->cacheTime, $this->cacheKey);
         }
         $db->from($this->getTable());
-        if (!empty($values)) {
-            if (is_array($values)) {
-                $isAsso = array_diff_assoc(array_keys($values), range(0, sizeof($values))) ? true : false;
+        if (!empty($where)) {
+            if (is_array($where)) {
+                $isAsso = array_diff_assoc(array_keys($where), range(0, sizeof($where))) ? true : false;
                 if ($isAsso) {
-                    $db->where($values);
+                    $db->where($where);
                 } else {
-                    $db->where([$this->getPrimaryKey() => array_values($values)]);
+                    $db->where([$this->getPrimaryKey() => array_values($where)]);
                 }
             } else {
-                is_callable($values) ? $values($db) : $db->where([$this->getPrimaryKey() => $values]);
+                is_callable($where) ? $where($db) : $db->where([$this->getPrimaryKey() => $where]);
             }
         }
         $result = static::findBefore($db, 'find');
